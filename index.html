@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Field Registry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -156,6 +159,25 @@
             <div class="form-col">
               <label for="f-abv">ABV %</label>
               <input type="number" id="f-abv" placeholder="e.g. 43" min="0" max="100" step="0.1" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-col">
+              <label for="f-price">Price ($)</label>
+              <input type="number" id="f-price" placeholder="e.g. 34.99" min="0" step="0.01" />
+            </div>
+            <div class="form-col">
+              <label for="f-size">Bottle Size</label>
+              <select id="f-size">
+                <option value="">Unknown</option>
+                <option value="50ml">50ml — Nip</option>
+                <option value="200ml">200ml</option>
+                <option value="375ml">375ml — Half</option>
+                <option value="750ml">750ml — Standard</option>
+                <option value="1L">1L</option>
+                <option value="1.75L">1.75L — Handle</option>
+              </select>
             </div>
           </div>
 
