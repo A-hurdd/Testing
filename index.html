@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manga Inventory</title>
+  <title>Field Registry</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -11,13 +11,13 @@
   <header>
     <div class="header-left">
       <span class="header-label">// SYS :: INVENTORY CONTROL //</span>
-      <h1>Manga Registry</h1>
+      <h1>Field Registry</h1>
     </div>
     <div class="header-actions">
       <div class="header-stats" id="header-stats">
         ENTRIES: <span id="stat-total">0</span> &nbsp;|&nbsp;
-        READING: <span id="stat-reading">0</span> &nbsp;|&nbsp;
-        COMPLETE: <span id="stat-complete">0</span>
+        <span id="stat-label-b">READING</span>: <span id="stat-b">0</span> &nbsp;|&nbsp;
+        <span id="stat-label-c">COMPLETE</span>: <span id="stat-c">0</span>
       </div>
       <div class="search-wrap">
         <input type="text" id="search" placeholder="SEARCH..." />
@@ -26,24 +26,59 @@
     </div>
   </header>
 
+  <!-- Category Tabs -->
+  <nav class="cat-tabs">
+    <button class="cat-tab active" data-cat="manga">&#x25A0; Manga</button>
+    <button class="cat-tab" data-cat="spirits">&#x25A0; Spirits</button>
+  </nav>
+
   <main>
     <div class="toolbar">
       <div class="filters">
         <span class="toolbar-label">Filter:</span>
-        <select id="filter-status">
-          <option value="">All Statuses</option>
-          <option value="Reading">Reading</option>
-          <option value="Completed">Completed</option>
-          <option value="On Hold">On Hold</option>
-          <option value="Plan to Read">Plan to Read</option>
-          <option value="Dropped">Dropped</option>
-        </select>
-        <select id="filter-genre">
-          <option value="">All Genres</option>
-        </select>
+
+        <!-- Manga filters -->
+        <div id="filters-manga" class="filter-group">
+          <select id="filter-manga-status">
+            <option value="">All Statuses</option>
+            <option value="Reading">Reading</option>
+            <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Plan to Read">Plan to Read</option>
+            <option value="Dropped">Dropped</option>
+          </select>
+          <select id="filter-manga-genre">
+            <option value="">All Genres</option>
+          </select>
+        </div>
+
+        <!-- Spirits filters -->
+        <div id="filters-spirits" class="filter-group hidden">
+          <select id="filter-spirits-status">
+            <option value="">All Statuses</option>
+            <option value="Sealed">Sealed</option>
+            <option value="Open">Open</option>
+            <option value="Finished">Finished</option>
+            <option value="Gifted">Gifted</option>
+          </select>
+          <select id="filter-spirits-type">
+            <option value="">All Types</option>
+            <option value="Whiskey">Whiskey</option>
+            <option value="Bourbon">Bourbon</option>
+            <option value="Scotch">Scotch</option>
+            <option value="Rum">Rum</option>
+            <option value="Vodka">Vodka</option>
+            <option value="Gin">Gin</option>
+            <option value="Tequila">Tequila</option>
+            <option value="Brandy">Brandy</option>
+            <option value="Liqueur">Liqueur</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
         <select id="sort-by">
-          <option value="title">Sort: Title</option>
-          <option value="volumes">Sort: Volumes</option>
+          <option value="name">Sort: Name</option>
+          <option value="score">Sort: Score</option>
           <option value="status">Sort: Status</option>
           <option value="dateAdded">Sort: Date Added</option>
         </select>
@@ -61,53 +96,115 @@
     <p id="empty-msg" class="empty-msg hidden">Initialize inventory — deploy first entry to begin tracking.</p>
   </main>
 
-  <!-- Add / Edit Modal -->
+  <!-- ── Add / Edit Modal ── -->
   <div id="modal-overlay" class="modal-overlay hidden">
     <div class="modal">
-      <h2 id="modal-title">Add Manga</h2>
-      <form id="manga-form">
+      <h2 id="modal-title">Add Entry</h2>
+      <form id="entry-form">
         <input type="hidden" id="edit-id" />
+        <input type="hidden" id="edit-cat" />
 
-        <label for="f-title">Title <span class="required">*</span></label>
-        <input type="text" id="f-title" placeholder="e.g. Berserk" required />
+        <!-- ── Shared: Name ── -->
+        <label for="f-name">Name <span class="required">*</span></label>
+        <input type="text" id="f-name" placeholder="e.g. Berserk" required />
 
-        <label for="f-volumes">Volumes Owned</label>
-        <input type="number" id="f-volumes" placeholder="e.g. 12" min="0" />
+        <!-- ── Manga fields ── -->
+        <div id="form-manga" class="form-section">
+          <label for="f-volumes">Volumes Owned</label>
+          <input type="number" id="f-volumes" placeholder="e.g. 12" min="0" />
 
-        <label for="f-total">Total Volumes (series)</label>
-        <input type="number" id="f-total" placeholder="e.g. 41 (0 = ongoing)" min="0" />
+          <label for="f-total">Total Volumes (0 = ongoing)</label>
+          <input type="number" id="f-total" placeholder="e.g. 41" min="0" />
 
-        <label for="f-genre">Genre</label>
-        <input type="text" id="f-genre" placeholder="e.g. Dark Fantasy" />
+          <label for="f-genre">Genre</label>
+          <input type="text" id="f-genre" placeholder="e.g. Dark Fantasy" />
 
-        <label for="f-status">Status</label>
-        <select id="f-status">
-          <option value="Plan to Read">Plan to Read</option>
-          <option value="Reading">Reading</option>
-          <option value="Completed">Completed</option>
-          <option value="On Hold">On Hold</option>
-          <option value="Dropped">Dropped</option>
-        </select>
+          <label for="f-manga-status">Status</label>
+          <select id="f-manga-status">
+            <option value="Plan to Read">Plan to Read</option>
+            <option value="Reading">Reading</option>
+            <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Dropped">Dropped</option>
+          </select>
+        </div>
 
+        <!-- ── Spirits fields ── -->
+        <div id="form-spirits" class="form-section hidden">
+          <label for="f-brand">Brand</label>
+          <input type="text" id="f-brand" placeholder="e.g. Glenfiddich" />
+
+          <label for="f-spirit-type">Type</label>
+          <select id="f-spirit-type">
+            <option value="Whiskey">Whiskey</option>
+            <option value="Bourbon">Bourbon</option>
+            <option value="Scotch">Scotch</option>
+            <option value="Rum">Rum</option>
+            <option value="Vodka">Vodka</option>
+            <option value="Gin">Gin</option>
+            <option value="Tequila">Tequila</option>
+            <option value="Brandy">Brandy</option>
+            <option value="Liqueur">Liqueur</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <div class="form-row">
+            <div class="form-col">
+              <label for="f-age">Age / Expression</label>
+              <input type="text" id="f-age" placeholder="e.g. 12 Year" />
+            </div>
+            <div class="form-col">
+              <label for="f-abv">ABV %</label>
+              <input type="number" id="f-abv" placeholder="e.g. 43" min="0" max="100" step="0.1" />
+            </div>
+          </div>
+
+          <label for="f-spirits-status">Status</label>
+          <select id="f-spirits-status">
+            <option value="Sealed">Sealed</option>
+            <option value="Open">Open</option>
+            <option value="Finished">Finished</option>
+            <option value="Gifted">Gifted</option>
+          </select>
+        </div>
+
+        <!-- ── Shared: Score ── -->
+        <label>Score</label>
+        <div class="score-row" id="score-row">
+          <button type="button" class="score-btn" data-val="1">1</button>
+          <button type="button" class="score-btn" data-val="2">2</button>
+          <button type="button" class="score-btn" data-val="3">3</button>
+          <button type="button" class="score-btn" data-val="4">4</button>
+          <button type="button" class="score-btn" data-val="5">5</button>
+          <button type="button" class="score-btn" data-val="6">6</button>
+          <button type="button" class="score-btn" data-val="7">7</button>
+          <button type="button" class="score-btn" data-val="8">8</button>
+          <button type="button" class="score-btn" data-val="9">9</button>
+          <button type="button" class="score-btn" data-val="10">10</button>
+          <span class="score-label" id="score-label">—</span>
+        </div>
+        <input type="hidden" id="f-score" value="" />
+
+        <!-- ── Shared: Notes ── -->
         <label for="f-notes">Notes</label>
-        <textarea id="f-notes" placeholder="Optional notes..."></textarea>
+        <textarea id="f-notes" placeholder="Tasting notes, thoughts..."></textarea>
 
         <div class="modal-actions">
           <button type="button" id="btn-cancel" class="btn-secondary">Cancel</button>
-          <button type="submit" class="btn-primary">Save</button>
+          <button type="submit" class="btn-primary">[ SAVE ]</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Delete Confirm Modal -->
+  <!-- ── Delete Confirm Modal ── -->
   <div id="delete-overlay" class="modal-overlay hidden">
     <div class="modal modal-sm">
-      <h2>Delete Manga?</h2>
-      <p id="delete-msg">This will permanently remove this entry.</p>
+      <h2>Confirm Delete</h2>
+      <p id="delete-msg">This entry will be permanently removed from the registry.</p>
       <div class="modal-actions">
-        <button id="btn-delete-cancel" class="btn-secondary">Cancel</button>
-        <button id="btn-delete-confirm" class="btn-danger">Delete</button>
+        <button id="btn-delete-cancel" class="btn-secondary">Abort</button>
+        <button id="btn-delete-confirm" class="btn-danger">[ Delete ]</button>
       </div>
     </div>
   </div>
