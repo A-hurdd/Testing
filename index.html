@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manga Inventory</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <h1>&#x1F4DA; Manga Inventory</h1>
+    <div class="header-actions">
+      <input type="text" id="search" placeholder="Search titles..." />
+      <button id="btn-add" class="btn-primary">+ Add Manga</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <div class="filters">
+        <select id="filter-status">
+          <option value="">All Statuses</option>
+          <option value="Reading">Reading</option>
+          <option value="Completed">Completed</option>
+          <option value="On Hold">On Hold</option>
+          <option value="Plan to Read">Plan to Read</option>
+          <option value="Dropped">Dropped</option>
+        </select>
+        <select id="filter-genre">
+          <option value="">All Genres</option>
+        </select>
+        <select id="sort-by">
+          <option value="title">Sort: Title</option>
+          <option value="volumes">Sort: Volumes</option>
+          <option value="status">Sort: Status</option>
+          <option value="dateAdded">Sort: Date Added</option>
+        </select>
+      </div>
+      <div class="view-toggle">
+        <button id="view-grid" class="view-btn active" title="Grid view">&#9632;&#9632;</button>
+        <button id="view-list" class="view-btn" title="List view">&#9776;</button>
+      </div>
+    </div>
+
+    <div id="inventory" class="grid-view">
+      <!-- Cards rendered here by JS -->
+    </div>
+
+    <p id="empty-msg" class="empty-msg hidden">No manga found. Add some to get started!</p>
+  </main>
+
+  <!-- Add / Edit Modal -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal">
+      <h2 id="modal-title">Add Manga</h2>
+      <form id="manga-form">
+        <input type="hidden" id="edit-id" />
+
+        <label for="f-title">Title <span class="required">*</span></label>
+        <input type="text" id="f-title" placeholder="e.g. Berserk" required />
+
+        <label for="f-volumes">Volumes Owned</label>
+        <input type="number" id="f-volumes" placeholder="e.g. 12" min="0" />
+
+        <label for="f-total">Total Volumes (series)</label>
+        <input type="number" id="f-total" placeholder="e.g. 41 (0 = ongoing)" min="0" />
+
+        <label for="f-genre">Genre</label>
+        <input type="text" id="f-genre" placeholder="e.g. Dark Fantasy" />
+
+        <label for="f-status">Status</label>
+        <select id="f-status">
+          <option value="Plan to Read">Plan to Read</option>
+          <option value="Reading">Reading</option>
+          <option value="Completed">Completed</option>
+          <option value="On Hold">On Hold</option>
+          <option value="Dropped">Dropped</option>
+        </select>
+
+        <label for="f-notes">Notes</label>
+        <textarea id="f-notes" placeholder="Optional notes..."></textarea>
+
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Delete Confirm Modal -->
+  <div id="delete-overlay" class="modal-overlay hidden">
+    <div class="modal modal-sm">
+      <h2>Delete Manga?</h2>
+      <p id="delete-msg">This will permanently remove this entry.</p>
+      <div class="modal-actions">
+        <button id="btn-delete-cancel" class="btn-secondary">Cancel</button>
+        <button id="btn-delete-confirm" class="btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
