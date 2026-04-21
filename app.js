@@ -10,25 +10,20 @@ const state = {
   }
 };
 
-// ── Storage ──
 function loadAll() {
   return JSON.parse(localStorage.getItem('fieldRegistry') || '[]');
 }
-
 function saveAll(data) {
   localStorage.setItem('fieldRegistry', JSON.stringify(data));
 }
-
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-// ── Render pipeline ──
 function render() {
   const data    = loadAll();
   const catData = data.filter(e => e.cat === state.cat);
   const visible = applyFiltersAndSort(catData);
-
   updateStats(data);
   updateGenreFilter(catData);
   renderInventory(visible);
@@ -37,11 +32,9 @@ function render() {
 function applyFiltersAndSort(entries) {
   const f = state.filters[state.cat];
   const q = state.search.toLowerCase().trim();
-
   let out = entries.filter(e => {
     if (q) {
-      const hay = [e.name, e.notes, e.genre, e.brand, e.type, e.age]
-        .filter(Boolean).join(' ').toLowerCase();
+      const hay = [e.name, e.notes, e.genre, e.brand, e.type, e.age].filter(Boolean).join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     if (state.cat === 'manga') {
@@ -53,7 +46,6 @@ function applyFiltersAndSort(entries) {
     }
     return true;
   });
-
   out.sort((a, b) => {
     switch (state.sort) {
       case 'score':     return (b.score || 0) - (a.score || 0);
@@ -63,15 +55,12 @@ function applyFiltersAndSort(entries) {
       default:          return a.name.localeCompare(b.name);
     }
   });
-
   return out;
 }
 
-// ── Stats bar ──
 function updateStats(data) {
   const cat = data.filter(e => e.cat === state.cat);
   document.getElementById('stat-total').textContent = cat.length;
-
   if (state.cat === 'manga') {
     document.getElementById('stat-label-b').textContent = 'READING';
     document.getElementById('stat-label-c').textContent = 'COMPLETE';
@@ -85,7 +74,6 @@ function updateStats(data) {
   }
 }
 
-// ── Dynamic genre dropdown ──
 function updateGenreFilter(catData) {
   if (state.cat !== 'manga') return;
   const sel     = document.getElementById('filter-manga-genre');
@@ -95,11 +83,9 @@ function updateGenreFilter(catData) {
     genres.map(g => `<option value="${g}"${g === current ? ' selected' : ''}>${g}</option>`).join('');
 }
 
-// ── Render inventory container ──
 function renderInventory(entries) {
   const inv   = document.getElementById('inventory');
   const empty = document.getElementById('empty-msg');
-
   if (!entries.length) {
     inv.innerHTML = '';
     empty.classList.remove('hidden');
@@ -112,14 +98,11 @@ function renderInventory(entries) {
   ).join('');
 }
 
-// ── Card (grid) ──
 function renderCard(e, i) {
   const idx       = String(i + 1).padStart(3, '0');
   const badge     = `<span class="${badgeCls(e.status)}">${e.status}</span>`;
   const scoreHtml = scoreDisplay(e.score);
-  const notesHtml = e.notes
-    ? `<div class="card-notes">${esc(e.notes)}</div>` : '';
-
+  const notesHtml = e.notes ? `<div class="card-notes">${esc(e.notes)}</div>` : '';
   let body = '';
   if (e.cat === 'manga') {
     const owned = e.volumes || 0;
@@ -136,11 +119,15 @@ function renderCard(e, i) {
         TYPE: <span>${e.type || '—'}</span>
         ${e.age  ? ` &nbsp;·&nbsp; <span>${esc(e.age)}</span>` : ''}
         ${e.abv  ? ` &nbsp;·&nbsp; ABV: <span>${e.abv}%</span>` : ''}
+      </div>
+      <div class="card-volumes">
+        ${e.size  ? `SIZE: <span>${esc(e.size)}</span>` : ''}
+        ${e.size && e.price ? ' &nbsp;·&nbsp; ' : ''}
+        ${e.price ? `PRICE: <span>$${parseFloat(e.price).toFixed(2)}</span>` : ''}
       </div>`;
   }
-
   return `
-    <div class="card bracketed" data-id="${e.id}">
+    <div class="card" data-id="${e.id}">
       <div class="card-index">REC-${idx} &nbsp; ${badge}</div>
       <div class="card-title">${esc(e.name)}</div>
       ${body}
@@ -153,11 +140,9 @@ function renderCard(e, i) {
     </div>`;
 }
 
-// ── Row (list) ──
 function renderRow(e, i) {
   const idx   = String(i + 1).padStart(3, '0');
   const badge = `<span class="${badgeCls(e.status)}">${e.status}</span>`;
-
   let mid = '';
   if (e.cat === 'manga') {
     mid = `
@@ -166,9 +151,9 @@ function renderRow(e, i) {
   } else {
     mid = `
       <span class="list-genre">${e.type || '—'}${e.brand ? ' · ' + esc(e.brand) : ''}</span>
-      <span class="list-vols">${e.abv ? `ABV: <span>${e.abv}%</span>` : '—'}</span>`;
+      <span class="list-vols">${e.size ? `<span>${esc(e.size)}</span>` : ''}${e.size && e.abv ? ' · ' : ''}${e.abv ? `ABV: <span>${e.abv}%</span>` : ''}</span>
+      ${e.price ? `<span class="list-vols">$<span>${parseFloat(e.price).toFixed(2)}</span></span>` : ''}`;
   }
-
   return `
     <div class="list-row" data-id="${e.id}">
       <span class="list-index">${idx}</span>
@@ -183,7 +168,6 @@ function renderRow(e, i) {
     </div>`;
 }
 
-// ── Score display ──
 const SCORE_TAG = ['', 'AVOID', 'AVOID', 'LOW', 'FAIR', 'FAIR', 'GOOD', 'GOOD', 'GREAT', 'GREAT', 'ELITE'];
 
 function scoreDisplay(score) {
@@ -199,7 +183,6 @@ function scoreDisplay(score) {
   </div>`;
 }
 
-// ── Helpers ──
 function badgeCls(status) {
   return 'badge badge-' + (status || 'Unknown').replace(/\s+/g, '-');
 }
@@ -212,7 +195,6 @@ function esc(str) {
     .replace(/"/g, '&quot;');
 }
 
-// ── Tab switching ──
 document.querySelectorAll('.cat-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     state.cat = btn.dataset.cat;
@@ -224,7 +206,6 @@ document.querySelectorAll('.cat-tab').forEach(btn => {
   });
 });
 
-// ── View toggle ──
 document.getElementById('view-grid').addEventListener('click', () => {
   state.view = 'grid';
   document.getElementById('view-grid').classList.add('active');
@@ -238,20 +219,13 @@ document.getElementById('view-list').addEventListener('click', () => {
   render();
 });
 
-// ── Search ──
-document.getElementById('search').addEventListener('input', e => {
-  state.search = e.target.value;
-  render();
-});
-
-// ── Filter & sort listeners ──
+document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; render(); });
 document.getElementById('filter-manga-status').addEventListener('change',   e => { state.filters.manga.status   = e.target.value; render(); });
 document.getElementById('filter-manga-genre').addEventListener('change',    e => { state.filters.manga.genre    = e.target.value; render(); });
 document.getElementById('filter-spirits-status').addEventListener('change', e => { state.filters.spirits.status = e.target.value; render(); });
 document.getElementById('filter-spirits-type').addEventListener('change',   e => { state.filters.spirits.type   = e.target.value; render(); });
 document.getElementById('sort-by').addEventListener('change',               e => { state.sort                   = e.target.value; render(); });
 
-// ── Modal helpers ──
 function showModal(id)  { document.getElementById(id).classList.remove('hidden'); }
 function hideModal(id)  { document.getElementById(id).classList.add('hidden'); }
 
@@ -264,13 +238,11 @@ function setFormCategory(cat) {
     (cat === 'manga' ? ' Manga' : ' Spirit');
 }
 
-// ── Score buttons ──
 let selectedScore = null;
 
 document.querySelectorAll('.score-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const val = parseInt(btn.dataset.val);
-    // clicking the active score again clears it
     if (selectedScore === val) {
       selectedScore = null;
       document.getElementById('f-score').value = '';
@@ -296,7 +268,6 @@ function resetScoreButtons(score) {
   );
 }
 
-// ── Open Add modal ──
 document.getElementById('btn-add').addEventListener('click', () => {
   document.getElementById('edit-id').value = '';
   document.getElementById('entry-form').reset();
@@ -306,42 +277,37 @@ document.getElementById('btn-add').addEventListener('click', () => {
   setTimeout(() => document.getElementById('f-name').focus(), 50);
 });
 
-// ── Open Edit modal ──
 function openEdit(id) {
   const entry = loadAll().find(e => e.id === id);
   if (!entry) return;
-
   document.getElementById('edit-id').value = id;
   document.getElementById('f-name').value  = entry.name || '';
   document.getElementById('f-notes').value = entry.notes || '';
   resetScoreButtons(entry.score || null);
-
   if (entry.cat === 'manga') {
     document.getElementById('f-volumes').value      = entry.volumes || '';
     document.getElementById('f-total').value        = entry.total   || '';
     document.getElementById('f-genre').value        = entry.genre   || '';
     document.getElementById('f-manga-status').value = entry.status  || 'Plan to Read';
   } else {
-    document.getElementById('f-brand').value           = entry.brand  || '';
-    document.getElementById('f-spirit-type').value     = entry.type   || 'Whiskey';
-    document.getElementById('f-age').value             = entry.age    || '';
-    document.getElementById('f-abv').value             = entry.abv    || '';
-    document.getElementById('f-spirits-status').value  = entry.status || 'Sealed';
+    document.getElementById('f-brand').value          = entry.brand  || '';
+    document.getElementById('f-spirit-type').value    = entry.type   || 'Whiskey';
+    document.getElementById('f-age').value            = entry.age    || '';
+    document.getElementById('f-abv').value            = entry.abv    || '';
+    document.getElementById('f-price').value          = entry.price  || '';
+    document.getElementById('f-size').value           = entry.size   || '';
+    document.getElementById('f-spirits-status').value = entry.status || 'Sealed';
   }
-
   setFormCategory(entry.cat);
   showModal('modal-overlay');
   setTimeout(() => document.getElementById('f-name').focus(), 50);
 }
 
-// ── Form submit (Add + Edit) ──
 document.getElementById('entry-form').addEventListener('submit', e => {
   e.preventDefault();
-
   const cat   = document.getElementById('edit-cat').value;
   const id    = document.getElementById('edit-id').value;
   const score = parseInt(document.getElementById('f-score').value) || null;
-
   let entry = {
     id:        id || uid(),
     cat,
@@ -350,7 +316,6 @@ document.getElementById('entry-form').addEventListener('submit', e => {
     notes:     document.getElementById('f-notes').value.trim(),
     dateAdded: id ? undefined : Date.now()
   };
-
   if (cat === 'manga') {
     entry.volumes = parseInt(document.getElementById('f-volumes').value) || 0;
     entry.total   = parseInt(document.getElementById('f-total').value)   || 0;
@@ -361,26 +326,22 @@ document.getElementById('entry-form').addEventListener('submit', e => {
     entry.type   = document.getElementById('f-spirit-type').value;
     entry.age    = document.getElementById('f-age').value.trim();
     entry.abv    = parseFloat(document.getElementById('f-abv').value) || null;
+    entry.price  = parseFloat(document.getElementById('f-price').value) || null;
+    entry.size   = document.getElementById('f-size').value;
     entry.status = document.getElementById('f-spirits-status').value;
   }
-
   const data = loadAll();
   if (id) {
     const idx = data.findIndex(e => e.id === id);
-    if (idx !== -1) {
-      entry.dateAdded = data[idx].dateAdded;
-      data[idx] = entry;
-    }
+    if (idx !== -1) { entry.dateAdded = data[idx].dateAdded; data[idx] = entry; }
   } else {
     data.push(entry);
   }
-
   saveAll(data);
   hideModal('modal-overlay');
   render();
 });
 
-// ── Delete ──
 let pendingDeleteId = null;
 
 function openDelete(id) {
@@ -394,8 +355,7 @@ function openDelete(id) {
 
 document.getElementById('btn-delete-confirm').addEventListener('click', () => {
   if (!pendingDeleteId) return;
-  const data = loadAll().filter(e => e.id !== pendingDeleteId);
-  saveAll(data);
+  saveAll(loadAll().filter(e => e.id !== pendingDeleteId));
   pendingDeleteId = null;
   hideModal('delete-overlay');
   render();
@@ -406,7 +366,6 @@ document.getElementById('btn-delete-cancel').addEventListener('click', () => {
   hideModal('delete-overlay');
 });
 
-// ── Cancel / close ──
 document.getElementById('btn-cancel').addEventListener('click', () => hideModal('modal-overlay'));
 
 document.getElementById('modal-overlay').addEventListener('click', e => {
@@ -415,32 +374,23 @@ document.getElementById('modal-overlay').addEventListener('click', e => {
 document.getElementById('delete-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('delete-overlay')) hideModal('delete-overlay');
 });
-
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    hideModal('modal-overlay');
-    hideModal('delete-overlay');
-  }
+  if (e.key === 'Escape') { hideModal('modal-overlay'); hideModal('delete-overlay'); }
 });
 
-// ── Mobile FAB ──
 document.getElementById('fab-add').addEventListener('click', () => {
   document.getElementById('btn-add').click();
 });
 
-// ── Mobile bottom nav ──
 document.querySelectorAll('.bnav-tab').forEach(btn => {
   btn.addEventListener('click', () => {
-    // mirror the category tab click
     const tab = document.querySelector(`.cat-tab[data-cat="${btn.dataset.cat}"]`);
     if (tab) tab.click();
-    // update bottom nav active state
     document.querySelectorAll('.bnav-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   });
 });
 
-// keep bottom nav in sync when desktop tabs are clicked
 document.querySelectorAll('.cat-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.bnav-tab').forEach(b =>
@@ -449,5 +399,4 @@ document.querySelectorAll('.cat-tab').forEach(btn => {
   });
 });
 
-// ── Boot ──
 render();
