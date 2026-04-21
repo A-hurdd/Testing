@@ -251,9 +251,177 @@ document.getElementById('filter-spirits-status').addEventListener('change', e =>
 document.getElementById('filter-spirits-type').addEventListener('change',   e => { state.filters.spirits.type   = e.target.value; render(); });
 document.getElementById('sort-by').addEventListener('change',               e => { state.sort                   = e.target.value; render(); });
 
-// ── Stubs — wired in Chunk 3 ──
-function openEdit(id)   {}
-function openDelete(id) {}
+// ── Modal helpers ──
+function showModal(id)  { document.getElementById(id).classList.remove('hidden'); }
+function hideModal(id)  { document.getElementById(id).classList.add('hidden'); }
+
+function setFormCategory(cat) {
+  document.getElementById('form-manga').classList.toggle('hidden',   cat !== 'manga');
+  document.getElementById('form-spirits').classList.toggle('hidden', cat !== 'spirits');
+  document.getElementById('edit-cat').value = cat;
+  document.getElementById('modal-title').textContent =
+    (document.getElementById('edit-id').value ? 'Edit' : 'Add') +
+    (cat === 'manga' ? ' Manga' : ' Spirit');
+}
+
+// ── Score buttons ──
+let selectedScore = null;
+
+document.querySelectorAll('.score-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const val = parseInt(btn.dataset.val);
+    // clicking the active score again clears it
+    if (selectedScore === val) {
+      selectedScore = null;
+      document.getElementById('f-score').value = '';
+      document.getElementById('score-label').textContent = '—';
+      document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
+    } else {
+      selectedScore = val;
+      document.getElementById('f-score').value = val;
+      document.getElementById('score-label').textContent = SCORE_TAG[val];
+      document.querySelectorAll('.score-btn').forEach(b =>
+        b.classList.toggle('active', parseInt(b.dataset.val) === val)
+      );
+    }
+  });
+});
+
+function resetScoreButtons(score) {
+  selectedScore = score || null;
+  document.getElementById('f-score').value = score || '';
+  document.getElementById('score-label').textContent = score ? SCORE_TAG[score] : '—';
+  document.querySelectorAll('.score-btn').forEach(b =>
+    b.classList.toggle('active', parseInt(b.dataset.val) === score)
+  );
+}
+
+// ── Open Add modal ──
+document.getElementById('btn-add').addEventListener('click', () => {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('entry-form').reset();
+  resetScoreButtons(null);
+  setFormCategory(state.cat);
+  showModal('modal-overlay');
+  setTimeout(() => document.getElementById('f-name').focus(), 50);
+});
+
+// ── Open Edit modal ──
+function openEdit(id) {
+  const entry = loadAll().find(e => e.id === id);
+  if (!entry) return;
+
+  document.getElementById('edit-id').value = id;
+  document.getElementById('f-name').value  = entry.name || '';
+  document.getElementById('f-notes').value = entry.notes || '';
+  resetScoreButtons(entry.score || null);
+
+  if (entry.cat === 'manga') {
+    document.getElementById('f-volumes').value      = entry.volumes || '';
+    document.getElementById('f-total').value        = entry.total   || '';
+    document.getElementById('f-genre').value        = entry.genre   || '';
+    document.getElementById('f-manga-status').value = entry.status  || 'Plan to Read';
+  } else {
+    document.getElementById('f-brand').value           = entry.brand  || '';
+    document.getElementById('f-spirit-type').value     = entry.type   || 'Whiskey';
+    document.getElementById('f-age').value             = entry.age    || '';
+    document.getElementById('f-abv').value             = entry.abv    || '';
+    document.getElementById('f-spirits-status').value  = entry.status || 'Sealed';
+  }
+
+  setFormCategory(entry.cat);
+  showModal('modal-overlay');
+  setTimeout(() => document.getElementById('f-name').focus(), 50);
+}
+
+// ── Form submit (Add + Edit) ──
+document.getElementById('entry-form').addEventListener('submit', e => {
+  e.preventDefault();
+
+  const cat   = document.getElementById('edit-cat').value;
+  const id    = document.getElementById('edit-id').value;
+  const score = parseInt(document.getElementById('f-score').value) || null;
+
+  let entry = {
+    id:        id || uid(),
+    cat,
+    name:      document.getElementById('f-name').value.trim(),
+    score,
+    notes:     document.getElementById('f-notes').value.trim(),
+    dateAdded: id ? undefined : Date.now()
+  };
+
+  if (cat === 'manga') {
+    entry.volumes = parseInt(document.getElementById('f-volumes').value) || 0;
+    entry.total   = parseInt(document.getElementById('f-total').value)   || 0;
+    entry.genre   = document.getElementById('f-genre').value.trim();
+    entry.status  = document.getElementById('f-manga-status').value;
+  } else {
+    entry.brand  = document.getElementById('f-brand').value.trim();
+    entry.type   = document.getElementById('f-spirit-type').value;
+    entry.age    = document.getElementById('f-age').value.trim();
+    entry.abv    = parseFloat(document.getElementById('f-abv').value) || null;
+    entry.status = document.getElementById('f-spirits-status').value;
+  }
+
+  const data = loadAll();
+  if (id) {
+    const idx = data.findIndex(e => e.id === id);
+    if (idx !== -1) {
+      entry.dateAdded = data[idx].dateAdded;
+      data[idx] = entry;
+    }
+  } else {
+    data.push(entry);
+  }
+
+  saveAll(data);
+  hideModal('modal-overlay');
+  render();
+});
+
+// ── Delete ──
+let pendingDeleteId = null;
+
+function openDelete(id) {
+  const entry = loadAll().find(e => e.id === id);
+  if (!entry) return;
+  pendingDeleteId = id;
+  document.getElementById('delete-msg').textContent =
+    `"${entry.name}" will be permanently removed from the registry.`;
+  showModal('delete-overlay');
+}
+
+document.getElementById('btn-delete-confirm').addEventListener('click', () => {
+  if (!pendingDeleteId) return;
+  const data = loadAll().filter(e => e.id !== pendingDeleteId);
+  saveAll(data);
+  pendingDeleteId = null;
+  hideModal('delete-overlay');
+  render();
+});
+
+document.getElementById('btn-delete-cancel').addEventListener('click', () => {
+  pendingDeleteId = null;
+  hideModal('delete-overlay');
+});
+
+// ── Cancel / close ──
+document.getElementById('btn-cancel').addEventListener('click', () => hideModal('modal-overlay'));
+
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) hideModal('modal-overlay');
+});
+document.getElementById('delete-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('delete-overlay')) hideModal('delete-overlay');
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    hideModal('modal-overlay');
+    hideModal('delete-overlay');
+  }
+});
 
 // ── Boot ──
 render();
