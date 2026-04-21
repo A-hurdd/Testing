@@ -482,6 +482,11 @@ main { padding-bottom: 60px; }
 .badge-On-Hold        { background: #2a1e00; color: var(--amber); border: 1px solid #5a4000; }
 .badge-Plan-to-Read   { background: #101030; color: #7a7aff; border: 1px solid #2a2a60; }
 .badge-Dropped        { background: var(--danger-dim); color: var(--danger); border: 1px solid #8a1a1a; }
+/* Spirits */
+.badge-Sealed         { background: #101030; color: #9a9aee; border: 1px solid #2a2a60; }
+.badge-Open           { background: #0a2a10; color: var(--accent); border: 1px solid var(--accent-dim); box-shadow: 0 0 6px var(--accent-glow); }
+.badge-Finished       { background: #1e1e0a; color: var(--amber); border: 1px solid #5a4000; }
+.badge-Gifted         { background: #1a0a2a; color: #cc88ff; border: 1px solid #4a1a6a; }
 
 /* ── Empty message ── */
 .empty-msg {
@@ -713,11 +718,26 @@ main { padding-bottom: 60px; }
   font-weight: 700;
   font-size: 0.85rem;
 }
+.card-score .score-tag {
+  color: var(--amber);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  margin: 0 4px;
+}
 .card-score .score-pips {
   color: var(--accent-dim);
   letter-spacing: 0px;
 }
 .score-pip-filled { color: var(--accent); }
+
+/* ── List index ── */
+.list-index {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  flex-shrink: 0;
+}
 
 /* ── Utility ── */
 .hidden { display: none !important; }
