@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Field Registry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -26,7 +29,6 @@
     </div>
   </header>
 
-  <!-- Category Tabs -->
   <nav class="cat-tabs">
     <button class="cat-tab active" data-cat="manga">&#x25A0; Manga</button>
     <button class="cat-tab" data-cat="spirits">&#x25A0; Spirits</button>
@@ -36,8 +38,6 @@
     <div class="toolbar">
       <div class="filters">
         <span class="toolbar-label">Filter:</span>
-
-        <!-- Manga filters -->
         <div id="filters-manga" class="filter-group">
           <select id="filter-manga-status">
             <option value="">All Statuses</option>
@@ -51,8 +51,6 @@
             <option value="">All Genres</option>
           </select>
         </div>
-
-        <!-- Spirits filters -->
         <div id="filters-spirits" class="filter-group hidden">
           <select id="filter-spirits-status">
             <option value="">All Statuses</option>
@@ -75,7 +73,6 @@
             <option value="Other">Other</option>
           </select>
         </div>
-
         <select id="sort-by">
           <option value="name">Sort: Name</option>
           <option value="score">Sort: Score</option>
@@ -84,41 +81,30 @@
         </select>
       </div>
       <div class="view-toggle">
-        <button id="view-grid" class="view-btn active" title="Grid view">&#9632;&#9632;</button>
-        <button id="view-list" class="view-btn" title="List view">&#9776;</button>
+        <button id="view-grid" class="view-btn active">&#9632;&#9632;</button>
+        <button id="view-list" class="view-btn">&#9776;</button>
       </div>
     </div>
 
-    <div id="inventory" class="grid-view">
-      <!-- Cards rendered here by JS -->
-    </div>
-
+    <div id="inventory" class="grid-view"></div>
     <p id="empty-msg" class="empty-msg hidden">Initialize inventory — deploy first entry to begin tracking.</p>
   </main>
 
-  <!-- ── Add / Edit Modal ── -->
   <div id="modal-overlay" class="modal-overlay hidden">
     <div class="modal">
       <h2 id="modal-title">Add Entry</h2>
       <form id="entry-form">
         <input type="hidden" id="edit-id" />
         <input type="hidden" id="edit-cat" />
-
-        <!-- ── Shared: Name ── -->
         <label for="f-name">Name <span class="required">*</span></label>
         <input type="text" id="f-name" placeholder="e.g. Berserk" required />
-
-        <!-- ── Manga fields ── -->
         <div id="form-manga" class="form-section">
           <label for="f-volumes">Volumes Owned</label>
           <input type="number" id="f-volumes" placeholder="e.g. 12" min="0" />
-
           <label for="f-total">Total Volumes (0 = ongoing)</label>
           <input type="number" id="f-total" placeholder="e.g. 41" min="0" />
-
           <label for="f-genre">Genre</label>
           <input type="text" id="f-genre" placeholder="e.g. Dark Fantasy" />
-
           <label for="f-manga-status">Status</label>
           <select id="f-manga-status">
             <option value="Plan to Read">Plan to Read</option>
@@ -128,12 +114,9 @@
             <option value="Dropped">Dropped</option>
           </select>
         </div>
-
-        <!-- ── Spirits fields ── -->
         <div id="form-spirits" class="form-section hidden">
           <label for="f-brand">Brand</label>
           <input type="text" id="f-brand" placeholder="e.g. Glenfiddich" />
-
           <label for="f-spirit-type">Type</label>
           <select id="f-spirit-type">
             <option value="Whiskey">Whiskey</option>
@@ -147,7 +130,6 @@
             <option value="Liqueur">Liqueur</option>
             <option value="Other">Other</option>
           </select>
-
           <div class="form-row">
             <div class="form-col">
               <label for="f-age">Age / Expression</label>
@@ -158,7 +140,24 @@
               <input type="number" id="f-abv" placeholder="e.g. 43" min="0" max="100" step="0.1" />
             </div>
           </div>
-
+          <div class="form-row">
+            <div class="form-col">
+              <label for="f-price">Price ($)</label>
+              <input type="number" id="f-price" placeholder="e.g. 34.99" min="0" step="0.01" />
+            </div>
+            <div class="form-col">
+              <label for="f-size">Bottle Size</label>
+              <select id="f-size">
+                <option value="">Unknown</option>
+                <option value="50ml">50ml — Nip</option>
+                <option value="200ml">200ml</option>
+                <option value="375ml">375ml — Half</option>
+                <option value="750ml">750ml — Standard</option>
+                <option value="1L">1L</option>
+                <option value="1.75L">1.75L — Handle</option>
+              </select>
+            </div>
+          </div>
           <label for="f-spirits-status">Status</label>
           <select id="f-spirits-status">
             <option value="Sealed">Sealed</option>
@@ -167,8 +166,6 @@
             <option value="Gifted">Gifted</option>
           </select>
         </div>
-
-        <!-- ── Shared: Score ── -->
         <label>Score</label>
         <div class="score-row" id="score-row">
           <button type="button" class="score-btn" data-val="1">1</button>
@@ -184,11 +181,8 @@
           <span class="score-label" id="score-label">—</span>
         </div>
         <input type="hidden" id="f-score" value="" />
-
-        <!-- ── Shared: Notes ── -->
         <label for="f-notes">Notes</label>
         <textarea id="f-notes" placeholder="Tasting notes, thoughts..."></textarea>
-
         <div class="modal-actions">
           <button type="button" id="btn-cancel" class="btn-secondary">Cancel</button>
           <button type="submit" class="btn-primary">[ SAVE ]</button>
@@ -197,7 +191,6 @@
     </div>
   </div>
 
-  <!-- ── Delete Confirm Modal ── -->
   <div id="delete-overlay" class="modal-overlay hidden">
     <div class="modal modal-sm">
       <h2>Confirm Delete</h2>
@@ -209,10 +202,8 @@
     </div>
   </div>
 
-  <!-- Mobile FAB -->
   <button class="fab" id="fab-add" aria-label="Add entry">+</button>
 
-  <!-- Mobile bottom nav -->
   <nav class="bottom-nav">
     <button class="bnav-tab active" data-cat="manga" id="bnav-manga">
       <span class="bnav-icon">&#x1F4DA;</span>
