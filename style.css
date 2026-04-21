@@ -750,3 +750,280 @@ main { padding-bottom: 60px; }
   99% { opacity: 0.9; }
 }
 header h1 { animation: flicker 8s infinite; }
+
+/* ════════════════════════════════════════
+   MOBILE  ( ≤ 640px )
+   ════════════════════════════════════════ */
+@media (max-width: 640px) {
+
+  /* Push content above the fixed bottom nav */
+  body { padding-bottom: 72px; }
+
+  /* ── Header ── */
+  header {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 16px 10px;
+    gap: 8px;
+  }
+
+  .header-left { flex-direction: row; align-items: baseline; gap: 10px; }
+  .header-label { display: none; }
+  header h1 { font-size: 1.1rem; letter-spacing: 3px; }
+
+  .header-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .header-stats {
+    font-size: 0.65rem;
+    text-align: left;
+    letter-spacing: 0.5px;
+  }
+
+  .search-wrap { width: 100%; }
+  #search {
+    width: 100%;
+    clip-path: none;
+    font-size: 1rem;        /* prevents iOS zoom on focus */
+    padding: 10px 14px 10px 34px;
+  }
+
+  /* Hide desktop add button — replaced by FAB */
+  #btn-add { display: none; }
+
+  /* ── Category tabs ── */
+  .cat-tabs {
+    padding: 0;
+  }
+  .cat-tab {
+    flex: 1;
+    text-align: center;
+    padding: 12px 8px;
+    font-size: 0.72rem;
+    letter-spacing: 1.5px;
+  }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    padding: 8px 12px;
+    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters {
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .toolbar-label { display: none; }
+
+  .filters select {
+    font-size: 0.8rem;       /* prevents iOS zoom */
+    padding: 8px 10px;
+    flex-shrink: 0;
+  }
+
+  #sort-by { flex-shrink: 0; }
+
+  .view-toggle { align-self: flex-end; }
+  .view-btn { padding: 8px 14px; font-size: 0.8rem; }
+
+  /* ── Grid — single column ── */
+  #inventory.grid-view {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  /* ── Cards ── */
+  .card {
+    clip-path: none;          /* clip-path can cause tap issues on mobile */
+    border-left: 3px solid var(--accent-dim);
+  }
+  .card::before { display: none; }
+  .card:hover   { transform: none; }  /* no hover lift on touch */
+
+  .card-title { font-size: 1rem; }
+
+  .card-actions button {
+    padding: 10px 6px;        /* bigger tap target */
+    font-size: 0.72rem;
+  }
+
+  /* ── List rows ── */
+  #inventory.list-view { padding: 10px 12px; gap: 8px; }
+
+  .list-row {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 12px 14px;
+  }
+  .list-row::before { display: none; }
+  .list-title  { flex: 1 1 100%; font-size: 0.9rem; }
+  .list-genre  { flex: 1 1 auto; font-size: 0.75rem; }
+  .list-vols   { flex: 0 1 auto; font-size: 0.75rem; }
+  .list-index  { display: none; }
+
+  .list-actions { width: 100%; gap: 8px; }
+  .list-actions button {
+    flex: 1;
+    padding: 9px 6px;
+    font-size: 0.72rem;
+  }
+
+  /* ── Score buttons ── */
+  .score-row { gap: 4px; }
+  .score-btn {
+    width: 36px;
+    height: 36px;             /* larger touch target */
+    font-size: 0.8rem;
+  }
+
+  /* ── Modal — full screen sheet ── */
+  .modal-overlay { padding: 0; align-items: flex-end; }
+
+  .modal {
+    max-width: 100%;
+    width: 100%;
+    border-radius: 0;
+    clip-path: none;
+    padding: 20px 18px 32px;
+    max-height: 92vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    border-top: 2px solid var(--accent-dim);
+    animation: sheet-up 0.2s ease-out;
+  }
+
+  @keyframes sheet-up {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  .modal::before { display: none; }
+  .modal-sm { max-height: 60vh; }
+
+  #entry-form input,
+  #entry-form select,
+  #entry-form textarea {
+    font-size: 1rem;          /* prevents iOS zoom */
+    padding: 11px 13px;
+  }
+
+  .modal-actions { gap: 10px; }
+  .modal-actions button {
+    flex: 1;
+    padding: 12px;
+    font-size: 0.8rem;
+    clip-path: none;
+  }
+
+  .form-row { flex-direction: column; gap: 0; }
+  .form-col { gap: 10px; }
+
+  /* ── Empty message ── */
+  .empty-msg { padding: 50px 16px; font-size: 0.75rem; }
+}
+
+/* ── Floating Action Button (mobile add) ── */
+.fab {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 80px;
+    right: 18px;
+    width: 56px;
+    height: 56px;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 1.6rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 20px var(--accent-glow), 0 4px 14px rgba(0,0,0,0.6);
+    z-index: 150;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .fab:active {
+    transform: scale(0.92);
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+}
+
+/* ── Bottom nav bar (mobile) ── */
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 60px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 140;
+  }
+
+  .bottom-nav::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+  }
+
+  .bnav-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    gap: 3px;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bnav-tab.active { color: var(--accent); }
+  .bnav-tab .bnav-icon { font-size: 1.1rem; line-height: 1; }
+}
+
+/* ════════════════════════════════════════
+   TABLET  ( 641px – 900px )
+   ════════════════════════════════════════ */
+@media (min-width: 641px) and (max-width: 900px) {
+  header { padding: 14px 20px; }
+
+  #inventory.grid-view {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 16px 20px;
+  }
+
+  #inventory.list-view { padding: 16px 20px; }
+
+  .toolbar  { padding: 10px 20px; }
+  .cat-tabs { padding: 0 20px; }
+}

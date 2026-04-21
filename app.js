@@ -423,5 +423,31 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// ── Mobile FAB ──
+document.getElementById('fab-add').addEventListener('click', () => {
+  document.getElementById('btn-add').click();
+});
+
+// ── Mobile bottom nav ──
+document.querySelectorAll('.bnav-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    // mirror the category tab click
+    const tab = document.querySelector(`.cat-tab[data-cat="${btn.dataset.cat}"]`);
+    if (tab) tab.click();
+    // update bottom nav active state
+    document.querySelectorAll('.bnav-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// keep bottom nav in sync when desktop tabs are clicked
+document.querySelectorAll('.cat-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.bnav-tab').forEach(b =>
+      b.classList.toggle('active', b.dataset.cat === btn.dataset.cat)
+    );
+  });
+});
+
 // ── Boot ──
 render();
