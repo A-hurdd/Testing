@@ -9,16 +9,27 @@
 <body>
 
   <header>
-    <h1>&#x1F4DA; Manga Inventory</h1>
+    <div class="header-left">
+      <span class="header-label">// SYS :: INVENTORY CONTROL //</span>
+      <h1>Manga Registry</h1>
+    </div>
     <div class="header-actions">
-      <input type="text" id="search" placeholder="Search titles..." />
-      <button id="btn-add" class="btn-primary">+ Add Manga</button>
+      <div class="header-stats" id="header-stats">
+        ENTRIES: <span id="stat-total">0</span> &nbsp;|&nbsp;
+        READING: <span id="stat-reading">0</span> &nbsp;|&nbsp;
+        COMPLETE: <span id="stat-complete">0</span>
+      </div>
+      <div class="search-wrap">
+        <input type="text" id="search" placeholder="SEARCH..." />
+      </div>
+      <button id="btn-add" class="btn-primary">[+] ADD ENTRY</button>
     </div>
   </header>
 
   <main>
     <div class="toolbar">
       <div class="filters">
+        <span class="toolbar-label">Filter:</span>
         <select id="filter-status">
           <option value="">All Statuses</option>
           <option value="Reading">Reading</option>
@@ -47,7 +58,7 @@
       <!-- Cards rendered here by JS -->
     </div>
 
-    <p id="empty-msg" class="empty-msg hidden">No manga found. Add some to get started!</p>
+    <p id="empty-msg" class="empty-msg hidden">Initialize inventory — deploy first entry to begin tracking.</p>
   </main>
 
   <!-- Add / Edit Modal -->
