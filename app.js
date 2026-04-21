@@ -136,6 +136,11 @@ function renderCard(e, i) {
         TYPE: <span>${e.type || '—'}</span>
         ${e.age  ? ` &nbsp;·&nbsp; <span>${esc(e.age)}</span>` : ''}
         ${e.abv  ? ` &nbsp;·&nbsp; ABV: <span>${e.abv}%</span>` : ''}
+      </div>
+      <div class="card-volumes">
+        ${e.size  ? `SIZE: <span>${esc(e.size)}</span>` : ''}
+        ${e.size && e.price ? ' &nbsp;·&nbsp; ' : ''}
+        ${e.price ? `PRICE: <span>$${parseFloat(e.price).toFixed(2)}</span>` : ''}
       </div>`;
   }
 
@@ -166,7 +171,8 @@ function renderRow(e, i) {
   } else {
     mid = `
       <span class="list-genre">${e.type || '—'}${e.brand ? ' · ' + esc(e.brand) : ''}</span>
-      <span class="list-vols">${e.abv ? `ABV: <span>${e.abv}%</span>` : '—'}</span>`;
+      <span class="list-vols">${e.size ? `<span>${esc(e.size)}</span>` : ''}${e.size && e.abv ? ' · ' : ''}${e.abv ? `ABV: <span>${e.abv}%</span>` : ''}</span>
+      ${e.price ? `<span class="list-vols">$<span>${parseFloat(e.price).toFixed(2)}</span></span>` : ''}`;
   }
 
   return `
@@ -326,6 +332,8 @@ function openEdit(id) {
     document.getElementById('f-spirit-type').value     = entry.type   || 'Whiskey';
     document.getElementById('f-age').value             = entry.age    || '';
     document.getElementById('f-abv').value             = entry.abv    || '';
+    document.getElementById('f-price').value           = entry.price  || '';
+    document.getElementById('f-size').value            = entry.size   || '';
     document.getElementById('f-spirits-status').value  = entry.status || 'Sealed';
   }
 
@@ -361,6 +369,8 @@ document.getElementById('entry-form').addEventListener('submit', e => {
     entry.type   = document.getElementById('f-spirit-type').value;
     entry.age    = document.getElementById('f-age').value.trim();
     entry.abv    = parseFloat(document.getElementById('f-abv').value) || null;
+    entry.price  = parseFloat(document.getElementById('f-price').value) || null;
+    entry.size   = document.getElementById('f-size').value;
     entry.status = document.getElementById('f-spirits-status').value;
   }
 
