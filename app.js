@@ -40,7 +40,7 @@ function applyFiltersAndSort(entries) {
 
   let out = entries.filter(e => {
     if (q) {
-      const hay = [e.name, e.notes, e.genre, e.brand, e.type, e.age]
+      const hay = [e.name, e.notes, e.genre, e.brand, e.type, e.age, e.volume]
         .filter(Boolean).join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
@@ -130,6 +130,7 @@ function renderCard(e, i) {
       <div class="card-volumes">VOL: <span>${owned}</span> / ${total || '?'}</div>
       ${total > 0 ? `<div class="progress-wrap"><div class="progress-bar" style="width:${pct}%"></div></div>` : ''}`;
   } else {
+    const volumeLabel = e.volume ? `${e.volume}ml` : (e.size || '');
     body = `
       ${e.brand ? `<div class="card-genre">${esc(e.brand)}</div>` : ''}
       <div class="card-volumes">
@@ -138,9 +139,10 @@ function renderCard(e, i) {
         ${e.abv  ? ` &nbsp;·&nbsp; ABV: <span>${e.abv}%</span>` : ''}
       </div>
       <div class="card-volumes">
-        ${e.size  ? `SIZE: <span>${esc(e.size)}</span>` : ''}
-        ${e.size && e.price ? ' &nbsp;·&nbsp; ' : ''}
+        ${volumeLabel ? `VOL: <span>${esc(volumeLabel)}</span>` : ''}
+        ${volumeLabel && e.price ? ' &nbsp;·&nbsp; ' : ''}
         ${e.price ? `PRICE: <span>$${parseFloat(e.price).toFixed(2)}</span>` : ''}
+        ${e.volume && e.price ? ` &nbsp;·&nbsp; $/100ml: <span>$${((parseFloat(e.price) / parseFloat(e.volume)) * 100).toFixed(2)}</span>` : ''}
       </div>`;
   }
 
@@ -169,9 +171,10 @@ function renderRow(e, i) {
       <span class="list-genre">${e.genre ? esc(e.genre) : '—'}</span>
       <span class="list-vols">VOL: <span>${e.volumes || 0}${e.total ? ' / ' + e.total : ''}</span></span>`;
   } else {
+    const volumeLabel = e.volume ? `${e.volume}ml` : (e.size || '');
     mid = `
       <span class="list-genre">${e.type || '—'}${e.brand ? ' · ' + esc(e.brand) : ''}</span>
-      <span class="list-vols">${e.size ? `<span>${esc(e.size)}</span>` : ''}${e.size && e.abv ? ' · ' : ''}${e.abv ? `ABV: <span>${e.abv}%</span>` : ''}</span>
+      <span class="list-vols">${volumeLabel ? `<span>${esc(volumeLabel)}</span>` : ''}${volumeLabel && e.abv ? ' · ' : ''}${e.abv ? `ABV: <span>${e.abv}%</span>` : ''}</span>
       ${e.price ? `<span class="list-vols">$<span>${parseFloat(e.price).toFixed(2)}</span></span>` : ''}`;
   }
 
@@ -333,7 +336,7 @@ function openEdit(id) {
     document.getElementById('f-age').value             = entry.age    || '';
     document.getElementById('f-abv').value             = entry.abv    || '';
     document.getElementById('f-price').value           = entry.price  || '';
-    document.getElementById('f-size').value            = entry.size   || '';
+    document.getElementById('f-volume').value          = entry.volume || '';
     document.getElementById('f-spirits-status').value  = entry.status || 'Sealed';
   }
 
@@ -370,7 +373,7 @@ document.getElementById('entry-form').addEventListener('submit', e => {
     entry.age    = document.getElementById('f-age').value.trim();
     entry.abv    = parseFloat(document.getElementById('f-abv').value) || null;
     entry.price  = parseFloat(document.getElementById('f-price').value) || null;
-    entry.size   = document.getElementById('f-size').value;
+    entry.volume = parseInt(document.getElementById('f-volume').value) || null;
     entry.status = document.getElementById('f-spirits-status').value;
   }
 
