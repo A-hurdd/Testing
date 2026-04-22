@@ -462,5 +462,48 @@ document.querySelectorAll('.cat-tab').forEach(btn => {
   });
 });
 
+// ── Export ──
+document.getElementById('btn-export').addEventListener('click', () => {
+  const data = loadAll();
+  if (!data.length) { alert('Nothing to export yet.'); return; }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `field-registry-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ── Import ──
+document.getElementById('import-file').addEventListener('change', function () {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const incoming = JSON.parse(e.target.result);
+      if (!Array.isArray(incoming)) throw new Error();
+      const existing = loadAll();
+      let merged;
+      if (existing.length && confirm(`You have ${existing.length} existing entries.\n\nOK = Merge (keep both)\nCancel = Replace (overwrite all)`)) {
+        const ids = new Set(existing.map(x => x.id));
+        merged = [...existing, ...incoming.filter(x => !ids.has(x.id))];
+      } else if (existing.length) {
+        merged = incoming;
+      } else {
+        merged = incoming;
+      }
+      saveAll(merged);
+      render();
+      alert(`Import complete — ${merged.length} entries loaded.`);
+    } catch {
+      alert('Import failed. File must be a valid Field Registry .json backup.');
+    }
+    this.value = '';
+  };
+  reader.readAsText(file);
+});
+
 // ── Boot ──
 render();
