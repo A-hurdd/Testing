@@ -131,6 +131,8 @@ header h1 {
   cursor: pointer;
   text-transform: uppercase;
   transition: background 0.15s, color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
 }
 .btn-primary  { background: var(--white); color: #000; border-color: var(--white); }
 .btn-primary:hover  { background: #000; color: var(--white); }
@@ -196,6 +198,9 @@ button:active { opacity: 0.75; }
   cursor: pointer;
   outline: none;
   transition: border-color 0.15s, color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
 }
 .filters select:hover,
 .filters select:focus { border-color: var(--white); color: var(--white); }
@@ -210,6 +215,10 @@ button:active { opacity: 0.75; }
   font-family: var(--font-mono);
   font-size: 0.75rem;
   transition: all 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  line-height: 1;
 }
 .view-btn:hover { border-color: var(--white); color: var(--white); }
 .view-btn.active { background: var(--white); color: #000; border-color: var(--white); }
@@ -524,6 +533,9 @@ main { padding-bottom: 60px; }
   outline: none;
   transition: border-color 0.15s;
   letter-spacing: 0.5px;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
 }
 #entry-form input:focus,
 #entry-form select:focus,
@@ -592,6 +604,9 @@ main { padding-bottom: 60px; }
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
 }
 .btn-io:hover { border-color: var(--white); color: var(--white); }
 .btn-io input[type="file"] { display: none; }
