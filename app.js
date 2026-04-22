@@ -10,15 +10,9 @@ const state = {
   }
 };
 
-function loadAll() {
-  return JSON.parse(localStorage.getItem('fieldRegistry') || '[]');
-}
-function saveAll(data) {
-  localStorage.setItem('fieldRegistry', JSON.stringify(data));
-}
-function uid() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-}
+function loadAll() { return JSON.parse(localStorage.getItem('fieldRegistry') || '[]'); }
+function saveAll(data) { localStorage.setItem('fieldRegistry', JSON.stringify(data)); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
 function render() {
   const data    = loadAll();
@@ -34,7 +28,8 @@ function applyFiltersAndSort(entries) {
   const q = state.search.toLowerCase().trim();
   let out = entries.filter(e => {
     if (q) {
-      const hay = [e.name, e.notes, e.genre, e.brand, e.type, e.age].filter(Boolean).join(' ').toLowerCase();
+      const hay = [e.name, e.notes, e.genre, e.brand, e.type, e.age]
+        .filter(Boolean).join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     if (state.cat === 'manga') {
@@ -66,11 +61,15 @@ function updateStats(data) {
     document.getElementById('stat-label-c').textContent = 'COMPLETE';
     document.getElementById('stat-b').textContent = cat.filter(e => e.status === 'Reading').length;
     document.getElementById('stat-c').textContent = cat.filter(e => e.status === 'Completed').length;
+    document.getElementById('stat-value-wrap').classList.add('hidden');
   } else {
     document.getElementById('stat-label-b').textContent = 'OPEN';
     document.getElementById('stat-label-c').textContent = 'SEALED';
     document.getElementById('stat-b').textContent = cat.filter(e => e.status === 'Open').length;
     document.getElementById('stat-c').textContent = cat.filter(e => e.status === 'Sealed').length;
+    const total = cat.reduce((sum, e) => sum + (parseFloat(e.price) || 0), 0);
+    document.getElementById('stat-value').textContent = '$' + total.toFixed(2);
+    document.getElementById('stat-value-wrap').classList.remove('hidden');
   }
 }
 
@@ -79,18 +78,14 @@ function updateGenreFilter(catData) {
   const sel     = document.getElementById('filter-manga-genre');
   const current = sel.value;
   const genres  = [...new Set(catData.map(e => e.genre).filter(Boolean))].sort();
-  sel.innerHTML  = '<option value="">All Genres</option>' +
+  sel.innerHTML = '<option value="">All Genres</option>' +
     genres.map(g => `<option value="${g}"${g === current ? ' selected' : ''}>${g}</option>`).join('');
 }
 
 function renderInventory(entries) {
   const inv   = document.getElementById('inventory');
   const empty = document.getElementById('empty-msg');
-  if (!entries.length) {
-    inv.innerHTML = '';
-    empty.classList.remove('hidden');
-    return;
-  }
+  if (!entries.length) { inv.innerHTML = ''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
   inv.className = state.view === 'grid' ? 'grid-view' : 'list-view';
   inv.innerHTML = entries.map((e, i) =>
@@ -117,8 +112,8 @@ function renderCard(e, i) {
       ${e.brand ? `<div class="card-genre">${esc(e.brand)}</div>` : ''}
       <div class="card-volumes">
         TYPE: <span>${e.type || '—'}</span>
-        ${e.age  ? ` &nbsp;·&nbsp; <span>${esc(e.age)}</span>` : ''}
-        ${e.abv  ? ` &nbsp;·&nbsp; ABV: <span>${e.abv}%</span>` : ''}
+        ${e.age ? ` &nbsp;·&nbsp; <span>${esc(e.age)}</span>` : ''}
+        ${e.abv ? ` &nbsp;·&nbsp; ABV: <span>${e.abv}%</span>` : ''}
       </div>
       <div class="card-volumes">
         ${e.size  ? `SIZE: <span>${esc(e.size)}</span>` : ''}
@@ -130,9 +125,7 @@ function renderCard(e, i) {
     <div class="card" data-id="${e.id}">
       <div class="card-index">REC-${idx} &nbsp; ${badge}</div>
       <div class="card-title">${esc(e.name)}</div>
-      ${body}
-      ${scoreHtml}
-      ${notesHtml}
+      ${body}${scoreHtml}${notesHtml}
       <div class="card-actions">
         <button class="btn-edit" onclick="openEdit('${e.id}')">[ Edit ]</button>
         <button class="btn-del"  onclick="openDelete('${e.id}')">[ Del ]</button>
@@ -176,23 +169,12 @@ function scoreDisplay(score) {
   const pips = Array.from({ length: 10 }, (_, i) =>
     `<span class="${i < n ? 'score-pip-filled' : ''}">${i < n ? '■' : '□'}</span>`
   ).join('');
-  return `<div class="card-score">
-    <span class="score-val">${n}/10</span>
-    <span class="score-tag">${SCORE_TAG[n]}</span>
-    <span class="score-pips">${pips}</span>
-  </div>`;
+  return `<div class="card-score"><span class="score-val">${n}/10</span><span class="score-tag">${SCORE_TAG[n]}</span><span class="score-pips">${pips}</span></div>`;
 }
 
-function badgeCls(status) {
-  return 'badge badge-' + (status || 'Unknown').replace(/\s+/g, '-');
-}
-
+function badgeCls(status) { return 'badge badge-' + (status || 'Unknown').replace(/\s+/g, '-'); }
 function esc(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 document.querySelectorAll('.cat-tab').forEach(btn => {
@@ -224,7 +206,7 @@ document.getElementById('filter-manga-status').addEventListener('change',   e =>
 document.getElementById('filter-manga-genre').addEventListener('change',    e => { state.filters.manga.genre    = e.target.value; render(); });
 document.getElementById('filter-spirits-status').addEventListener('change', e => { state.filters.spirits.status = e.target.value; render(); });
 document.getElementById('filter-spirits-type').addEventListener('change',   e => { state.filters.spirits.type   = e.target.value; render(); });
-document.getElementById('sort-by').addEventListener('change',               e => { state.sort                   = e.target.value; render(); });
+document.getElementById('sort-by').addEventListener('change',               e => { state.sort = e.target.value; render(); });
 
 function showModal(id)  { document.getElementById(id).classList.remove('hidden'); }
 function hideModal(id)  { document.getElementById(id).classList.add('hidden'); }
@@ -281,7 +263,7 @@ function openEdit(id) {
   const entry = loadAll().find(e => e.id === id);
   if (!entry) return;
   document.getElementById('edit-id').value = id;
-  document.getElementById('f-name').value  = entry.name || '';
+  document.getElementById('f-name').value  = entry.name  || '';
   document.getElementById('f-notes').value = entry.notes || '';
   resetScoreButtons(entry.score || null);
   if (entry.cat === 'manga') {
@@ -309,8 +291,7 @@ document.getElementById('entry-form').addEventListener('submit', e => {
   const id    = document.getElementById('edit-id').value;
   const score = parseInt(document.getElementById('f-score').value) || null;
   let entry = {
-    id:        id || uid(),
-    cat,
+    id: id || uid(), cat,
     name:      document.getElementById('f-name').value.trim(),
     score,
     notes:     document.getElementById('f-notes').value.trim(),
@@ -325,7 +306,7 @@ document.getElementById('entry-form').addEventListener('submit', e => {
     entry.brand  = document.getElementById('f-brand').value.trim();
     entry.type   = document.getElementById('f-spirit-type').value;
     entry.age    = document.getElementById('f-age').value.trim();
-    entry.abv    = parseFloat(document.getElementById('f-abv').value) || null;
+    entry.abv    = parseFloat(document.getElementById('f-abv').value)   || null;
     entry.price  = parseFloat(document.getElementById('f-price').value) || null;
     entry.size   = document.getElementById('f-size').value;
     entry.status = document.getElementById('f-spirits-status').value;
@@ -343,7 +324,6 @@ document.getElementById('entry-form').addEventListener('submit', e => {
 });
 
 let pendingDeleteId = null;
-
 function openDelete(id) {
   const entry = loadAll().find(e => e.id === id);
   if (!entry) return;
@@ -352,7 +332,6 @@ function openDelete(id) {
     `"${entry.name}" will be permanently removed from the registry.`;
   showModal('delete-overlay');
 }
-
 document.getElementById('btn-delete-confirm').addEventListener('click', () => {
   if (!pendingDeleteId) return;
   saveAll(loadAll().filter(e => e.id !== pendingDeleteId));
@@ -360,14 +339,12 @@ document.getElementById('btn-delete-confirm').addEventListener('click', () => {
   hideModal('delete-overlay');
   render();
 });
-
 document.getElementById('btn-delete-cancel').addEventListener('click', () => {
   pendingDeleteId = null;
   hideModal('delete-overlay');
 });
 
 document.getElementById('btn-cancel').addEventListener('click', () => hideModal('modal-overlay'));
-
 document.getElementById('modal-overlay').addEventListener('click', e => {
   if (e.target === document.getElementById('modal-overlay')) hideModal('modal-overlay');
 });
@@ -378,9 +355,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') { hideModal('modal-overlay'); hideModal('delete-overlay'); }
 });
 
-document.getElementById('fab-add').addEventListener('click', () => {
-  document.getElementById('btn-add').click();
-});
+document.getElementById('fab-add').addEventListener('click', () => document.getElementById('btn-add').click());
 
 document.querySelectorAll('.bnav-tab').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -390,7 +365,6 @@ document.querySelectorAll('.bnav-tab').forEach(btn => {
     btn.classList.add('active');
   });
 });
-
 document.querySelectorAll('.cat-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.bnav-tab').forEach(b =>
@@ -399,4 +373,46 @@ document.querySelectorAll('.cat-tab').forEach(btn => {
   });
 });
 
+// ── Export ──
+document.getElementById('btn-export').addEventListener('click', () => {
+  const data = loadAll();
+  if (!data.length) { alert('Nothing to export yet.'); return; }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `field-registry-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+// ── Import ──
+document.getElementById('import-file').addEventListener('change', function () {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const incoming = JSON.parse(e.target.result);
+      if (!Array.isArray(incoming)) throw new Error();
+      const existing = loadAll();
+      let merged;
+      if (existing.length && confirm(`You have ${existing.length} existing entries.\n\nOK = Merge (keep both)\nCancel = Replace (overwrite all)`)) {
+        const ids = new Set(existing.map(x => x.id));
+        merged = [...existing, ...incoming.filter(x => !ids.has(x.id))];
+      } else {
+        merged = incoming;
+      }
+      saveAll(merged);
+      render();
+      alert(`Import complete — ${merged.length} entries loaded.`);
+    } catch {
+      alert('Import failed. File must be a valid Field Registry .json backup.');
+    }
+    this.value = '';
+  };
+  reader.readAsText(file);
+});
+
+// ── Boot ──
 render();
