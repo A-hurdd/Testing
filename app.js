@@ -77,11 +77,15 @@ function updateStats(data) {
     document.getElementById('stat-label-c').textContent = 'COMPLETE';
     document.getElementById('stat-b').textContent = cat.filter(e => e.status === 'Reading').length;
     document.getElementById('stat-c').textContent = cat.filter(e => e.status === 'Completed').length;
+    document.getElementById('stat-value-wrap').classList.add('hidden');
   } else {
     document.getElementById('stat-label-b').textContent = 'OPEN';
     document.getElementById('stat-label-c').textContent = 'SEALED';
     document.getElementById('stat-b').textContent = cat.filter(e => e.status === 'Open').length;
     document.getElementById('stat-c').textContent = cat.filter(e => e.status === 'Sealed').length;
+    const total = cat.reduce((sum, e) => sum + (parseFloat(e.price) || 0), 0);
+    document.getElementById('stat-value').textContent = '$' + total.toFixed(2);
+    document.getElementById('stat-value-wrap').classList.remove('hidden');
   }
 }
 
