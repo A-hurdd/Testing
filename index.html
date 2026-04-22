@@ -7,6 +7,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#080808" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Field Registry" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -21,9 +27,14 @@
         ENTRIES: <span id="stat-total">0</span> &nbsp;|&nbsp;
         <span id="stat-label-b">READING</span>: <span id="stat-b">0</span> &nbsp;|&nbsp;
         <span id="stat-label-c">COMPLETE</span>: <span id="stat-c">0</span>
+        <span id="stat-value-wrap"> &nbsp;|&nbsp; VALUE: <span id="stat-value">$0.00</span></span>
       </div>
       <div class="search-wrap">
         <input type="text" id="search" placeholder="SEARCH..." />
+      </div>
+      <div class="header-io">
+        <button id="btn-export" class="btn-io" title="Export all data as JSON">&#x2193; Export</button>
+        <label class="btn-io" title="Import JSON backup">&#x2191; Import<input type="file" id="import-file" accept=".json" /></label>
       </div>
       <button id="btn-add" class="btn-primary">[+] ADD ENTRY</button>
     </div>
@@ -47,9 +58,7 @@
             <option value="Plan to Read">Plan to Read</option>
             <option value="Dropped">Dropped</option>
           </select>
-          <select id="filter-manga-genre">
-            <option value="">All Genres</option>
-          </select>
+          <select id="filter-manga-genre"><option value="">All Genres</option></select>
         </div>
         <div id="filters-spirits" class="filter-group hidden">
           <select id="filter-spirits-status">
@@ -85,7 +94,6 @@
         <button id="view-list" class="view-btn">&#9776;</button>
       </div>
     </div>
-
     <div id="inventory" class="grid-view"></div>
     <p id="empty-msg" class="empty-msg hidden">Initialize inventory — deploy first entry to begin tracking.</p>
   </main>
