@@ -1,3 +1,75 @@
+// ── Auth ──
+(function () {
+  const screen = document.getElementById('lock-screen');
+  const sub    = document.getElementById('lock-sub');
+  const pw     = document.getElementById('lock-pw');
+  const pw2    = document.getElementById('lock-pw2');
+  const err    = document.getElementById('lock-err');
+  const btn    = document.getElementById('lock-btn');
+
+  if (sessionStorage.getItem('fr_unlocked') === '1') {
+    screen.classList.add('hidden');
+    return;
+  }
+
+  const isSetup = !localStorage.getItem('fr_hash');
+
+  if (isSetup) {
+    sub.textContent = 'CREATE PASSWORD';
+    pw.placeholder  = 'NEW PASSWORD';
+    pw2.classList.remove('hidden');
+    btn.textContent = '[ SET PASSWORD ]';
+  } else {
+    sub.textContent = 'ENTER PASSWORD';
+  }
+
+  async function sha256(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function unlock() {
+    sessionStorage.setItem('fr_unlocked', '1');
+    screen.style.animation = 'lock-out 0.2s ease-in forwards';
+    setTimeout(() => screen.classList.add('hidden'), 200);
+  }
+
+  async function submit() {
+    const val = pw.value;
+    if (!val) return;
+    err.classList.add('hidden');
+
+    if (isSetup) {
+      if (val.length < 6) {
+        err.textContent = 'MINIMUM 6 CHARACTERS';
+        err.classList.remove('hidden');
+        return;
+      }
+      if (val !== pw2.value) {
+        err.textContent = 'PASSWORDS DO NOT MATCH';
+        err.classList.remove('hidden');
+        return;
+      }
+      localStorage.setItem('fr_hash', await sha256(val));
+      unlock();
+    } else {
+      if (await sha256(val) === localStorage.getItem('fr_hash')) {
+        unlock();
+      } else {
+        err.textContent = 'INVALID — ACCESS DENIED';
+        err.classList.remove('hidden');
+        pw.value = '';
+        pw.focus();
+      }
+    }
+  }
+
+  btn.addEventListener('click', submit);
+  pw.addEventListener('keydown',  e => { if (e.key === 'Enter') submit(); });
+  pw2.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+  setTimeout(() => pw.focus(), 100);
+})();
+
 // ── State ──
 const state = {
   cat:     'manga',
@@ -340,7 +412,7 @@ function openEdit(id) {
     document.getElementById('f-age').value             = entry.age    || '';
     document.getElementById('f-abv').value             = entry.abv    || '';
     document.getElementById('f-price').value           = entry.price  || '';
-    document.getElementById('f-volume').value          = entry.volume || '';
+    document.getElementById('f-size').value             = entry.size   || '';
     document.getElementById('f-spirits-status').value  = entry.status || 'Sealed';
   }
 
@@ -377,7 +449,7 @@ document.getElementById('entry-form').addEventListener('submit', e => {
     entry.age    = document.getElementById('f-age').value.trim();
     entry.abv    = parseFloat(document.getElementById('f-abv').value) || null;
     entry.price  = parseFloat(document.getElementById('f-price').value) || null;
-    entry.volume = parseInt(document.getElementById('f-volume').value) || null;
+    entry.size   = document.getElementById('f-size').value || null;
     entry.status = document.getElementById('f-spirits-status').value;
   }
 

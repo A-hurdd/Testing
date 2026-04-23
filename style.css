@@ -611,6 +611,116 @@ main { padding-bottom: 60px; }
 .btn-io:hover { border-color: var(--white); color: var(--white); }
 .btn-io input[type="file"] { display: none; }
 
+/* ── Lock Screen ── */
+.lock-screen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lock-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 360px;
+  padding: 40px 24px;
+}
+
+.lock-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--muted);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.lock-title {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  letter-spacing: 8px;
+  color: var(--white);
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 0;
+}
+
+.lock-sub {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+#lock-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#lock-pw,
+#lock-pw2 {
+  width: 100%;
+  padding: 13px 16px;
+  background: #0d0d0d;
+  border: 1px solid var(--border-h);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  letter-spacing: 3px;
+  outline: none;
+  text-align: center;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  transition: border-color 0.15s;
+}
+
+#lock-pw:focus,
+#lock-pw2:focus { border-color: var(--white); }
+
+.lock-error {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  min-height: 1em;
+}
+
+.lock-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--white);
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 4px;
+  border: 1px solid var(--white);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
+  margin-top: 4px;
+}
+
+.lock-btn:hover { background: #000; color: var(--white); }
+
+@keyframes lock-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 /* ── Utility ── */
 .hidden { display: none !important; }
 .filter-group { display: contents; }

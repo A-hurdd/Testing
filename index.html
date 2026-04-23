@@ -17,6 +17,21 @@
 </head>
 <body>
 
+  <!-- ── Lock Screen ── -->
+  <div id="lock-screen" class="lock-screen">
+    <div class="lock-box">
+      <div class="lock-eyebrow">// ACCESS CONTROL //</div>
+      <h1 class="lock-title">Field Registry</h1>
+      <p class="lock-sub" id="lock-sub">AUTHENTICATING</p>
+      <div id="lock-form">
+        <input type="password" id="lock-pw"  placeholder="PASSWORD"         autocomplete="current-password" />
+        <input type="password" id="lock-pw2" placeholder="CONFIRM PASSWORD" autocomplete="new-password" class="hidden" />
+        <p class="lock-error hidden" id="lock-err">&nbsp;</p>
+        <button id="lock-btn" class="lock-btn">[ ENTER ]</button>
+      </div>
+    </div>
+  </div>
+
   <header>
     <div class="header-left">
       <span class="header-label">// SYS :: INVENTORY CONTROL //</span>
