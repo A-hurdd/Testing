@@ -3,275 +3,121 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Field Registry</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#080808" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Field Registry" />
-  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>Surgical Instrument Study</title>
+  <meta name="description" content="A searchable surgical instrument study guide with flash cards and quiz mode." />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header class="site-header">
+    <nav class="topbar" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Surgical Instrument Study home">
+        <span class="brand-mark">SI</span>
+        <span>
+          <strong>Surgical Instrument Study</strong>
+          <small>Search · Review · Quiz</small>
+        </span>
+      </a>
+      <div class="top-actions">
+        <button class="ghost-button" id="reset-progress" type="button">Reset learned</button>
+        <button class="primary-button" id="start-quiz" type="button">Quiz mode</button>
+      </div>
+    </nav>
 
-  <!-- ── Lock Screen ── -->
-  <div id="lock-screen" class="lock-screen">
-    <div class="lock-box">
-      <div class="lock-eyebrow">// ACCESS CONTROL //</div>
-      <h1 class="lock-title">Field Registry</h1>
-      <p class="lock-sub" id="lock-sub">AUTHENTICATING</p>
-      <div id="lock-form">
-        <input type="password" id="lock-pw"  placeholder="PASSWORD"         autocomplete="current-password" />
-        <input type="password" id="lock-pw2" placeholder="CONFIRM PASSWORD" autocomplete="new-password" class="hidden" />
-        <p class="lock-error hidden" id="lock-err">&nbsp;</p>
-        <button id="lock-btn" class="lock-btn">[ ENTER ]</button>
+    <section class="hero" id="top">
+      <div>
+        <p class="eyebrow">Clean instrument database</p>
+        <h1>Study surgical instruments with searchable cards and quick quizzes.</h1>
+        <p class="hero-copy">Filter by category, difficulty, and learned status. The instrument list lives in <code>instruments.json</code> so it is simple to edit or expand.</p>
       </div>
-    </div>
-  </div>
-
-  <header>
-    <div class="header-left">
-      <span class="header-label">// SYS :: INVENTORY CONTROL //</span>
-      <h1>Field Registry</h1>
-    </div>
-    <div class="header-actions">
-      <div class="header-stats" id="header-stats">
-        ENTRIES: <span id="stat-total">0</span> &nbsp;|&nbsp;
-        <span id="stat-label-b">READING</span>: <span id="stat-b">0</span> &nbsp;|&nbsp;
-        <span id="stat-label-c">COMPLETE</span>: <span id="stat-c">0</span>
-        <span id="stat-value-wrap"> &nbsp;|&nbsp; VALUE: <span id="stat-value">$0.00</span></span>
+      <div class="hero-card" aria-label="Study statistics">
+        <span class="stat"><strong id="total-count">0</strong>Total</span>
+        <span class="stat"><strong id="learned-count">0</strong>Learned</span>
+        <span class="stat"><strong id="category-count">0</strong>Categories</span>
       </div>
-      <div class="search-wrap">
-        <input type="text" id="search" placeholder="SEARCH..." />
-      </div>
-      <div class="header-io">
-        <button id="btn-export" class="btn-io" title="Export all data as JSON">&#x2193; Export</button>
-        <label class="btn-io" title="Import JSON backup">&#x2191; Import<input type="file" id="import-file" accept=".json" /></label>
-      </div>
-      <button id="btn-add" class="btn-primary">[+] ADD ENTRY</button>
-    </div>
+    </section>
   </header>
 
-  <!-- Category Tabs -->
-  <nav class="cat-tabs">
-    <button class="cat-tab active" data-cat="manga">&#x25A0; Manga</button>
-    <button class="cat-tab" data-cat="spirits">&#x25A0; Spirits</button>
-  </nav>
-
   <main>
-    <div class="toolbar">
-      <div class="filters">
-        <span class="toolbar-label">Filter:</span>
-
-        <!-- Manga filters -->
-        <div id="filters-manga" class="filter-group">
-          <select id="filter-manga-status">
-            <option value="">All Statuses</option>
-            <option value="Reading">Reading</option>
-            <option value="Completed">Completed</option>
-            <option value="On Hold">On Hold</option>
-            <option value="Plan to Read">Plan to Read</option>
-            <option value="Dropped">Dropped</option>
+    <section class="controls" aria-label="Search and filters">
+      <label class="search-box" for="search-input">
+        <span>Search instruments</span>
+        <input id="search-input" type="search" placeholder="Try: clamp, laparoscopic, skin closure..." autocomplete="off" />
+      </label>
+      <div class="filter-grid">
+        <label>Category
+          <select id="category-filter"><option value="all">All categories</option></select>
+        </label>
+        <label>Difficulty
+          <select id="difficulty-filter">
+            <option value="all">All difficulties</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
           </select>
-          <select id="filter-manga-genre">
-            <option value="">All Genres</option>
+        </label>
+        <label>Progress
+          <select id="learned-filter">
+            <option value="all">All progress</option>
+            <option value="learned">Learned</option>
+            <option value="unlearned">Not learned</option>
           </select>
-        </div>
-
-        <!-- Spirits filters -->
-        <div id="filters-spirits" class="filter-group hidden">
-          <select id="filter-spirits-status">
-            <option value="">All Statuses</option>
-            <option value="Sealed">Sealed</option>
-            <option value="Open">Open</option>
-            <option value="Finished">Finished</option>
-            <option value="Gifted">Gifted</option>
+        </label>
+        <label>Sort
+          <select id="sort-select">
+            <option value="name">Name A-Z</option>
+            <option value="category">Category</option>
+            <option value="difficulty">Difficulty</option>
           </select>
-          <select id="filter-spirits-type">
-            <option value="">All Types</option>
-            <option value="Whiskey">Whiskey</option>
-            <option value="Bourbon">Bourbon</option>
-            <option value="Scotch">Scotch</option>
-            <option value="Rum">Rum</option>
-            <option value="Vodka">Vodka</option>
-            <option value="Gin">Gin</option>
-            <option value="Tequila">Tequila</option>
-            <option value="Brandy">Brandy</option>
-            <option value="Liqueur">Liqueur</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-
-        <select id="sort-by">
-          <option value="name">Sort: Name</option>
-          <option value="score">Sort: Score</option>
-          <option value="status">Sort: Status</option>
-          <option value="dateAdded">Sort: Date Added</option>
-        </select>
+        </label>
       </div>
-      <div class="view-toggle">
-        <button id="view-grid" class="view-btn active" title="Grid view">&#9632;&#9632;</button>
-        <button id="view-list" class="view-btn" title="List view">&#9776;</button>
-      </div>
-    </div>
+    </section>
 
-    <div id="inventory" class="grid-view">
-      <!-- Cards rendered here by JS -->
-    </div>
+    <section class="results-bar" aria-live="polite">
+      <p><strong id="result-count">0</strong> instruments shown</p>
+      <div id="active-tags" class="active-tags"></div>
+    </section>
 
-    <p id="empty-msg" class="empty-msg hidden">Initialize inventory — deploy first entry to begin tracking.</p>
+    <section id="cards" class="cards" aria-label="Instrument cards"></section>
+    <p id="empty-state" class="empty-state" hidden>No instruments match your current search.</p>
   </main>
 
-  <!-- ── Add / Edit Modal ── -->
-  <div id="modal-overlay" class="modal-overlay hidden">
-    <div class="modal">
-      <h2 id="modal-title">Add Entry</h2>
-      <form id="entry-form">
-        <input type="hidden" id="edit-id" />
-        <input type="hidden" id="edit-cat" />
-
-        <!-- ── Shared: Name ── -->
-        <label for="f-name">Name <span class="required">*</span></label>
-        <input type="text" id="f-name" placeholder="e.g. Berserk" required />
-
-        <!-- ── Manga fields ── -->
-        <div id="form-manga" class="form-section">
-          <label for="f-volumes">Volumes Owned</label>
-          <input type="number" id="f-volumes" placeholder="e.g. 12" min="0" />
-
-          <label for="f-total">Total Volumes (0 = ongoing)</label>
-          <input type="number" id="f-total" placeholder="e.g. 41" min="0" />
-
-          <label for="f-genre">Genre</label>
-          <input type="text" id="f-genre" placeholder="e.g. Dark Fantasy" />
-
-          <label for="f-manga-status">Status</label>
-          <select id="f-manga-status">
-            <option value="Plan to Read">Plan to Read</option>
-            <option value="Reading">Reading</option>
-            <option value="Completed">Completed</option>
-            <option value="On Hold">On Hold</option>
-            <option value="Dropped">Dropped</option>
-          </select>
+  <dialog id="quiz-dialog" class="quiz-dialog">
+    <form method="dialog" class="quiz-panel">
+      <div class="quiz-header">
+        <div>
+          <p class="eyebrow">Quiz mode</p>
+          <h2 id="quiz-title">Identify the instrument</h2>
         </div>
-
-        <!-- ── Spirits fields ── -->
-        <div id="form-spirits" class="form-section hidden">
-          <label for="f-brand">Brand</label>
-          <input type="text" id="f-brand" placeholder="e.g. Glenfiddich" />
-
-          <label for="f-spirit-type">Type</label>
-          <select id="f-spirit-type">
-            <option value="Whiskey">Whiskey</option>
-            <option value="Bourbon">Bourbon</option>
-            <option value="Scotch">Scotch</option>
-            <option value="Rum">Rum</option>
-            <option value="Vodka">Vodka</option>
-            <option value="Gin">Gin</option>
-            <option value="Tequila">Tequila</option>
-            <option value="Brandy">Brandy</option>
-            <option value="Liqueur">Liqueur</option>
-            <option value="Other">Other</option>
-          </select>
-
-          <div class="form-row">
-            <div class="form-col">
-              <label for="f-age">Age / Expression</label>
-              <input type="text" id="f-age" placeholder="e.g. 12 Year" />
-            </div>
-            <div class="form-col">
-              <label for="f-abv">ABV %</label>
-              <input type="number" id="f-abv" placeholder="e.g. 43" min="0" max="100" step="0.1" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-col">
-              <label for="f-price">Price ($)</label>
-              <input type="number" id="f-price" placeholder="e.g. 34.99" min="0" step="0.01" />
-            </div>
-            <div class="form-col">
-              <label for="f-size">Bottle Size</label>
-              <select id="f-size">
-                <option value="">Unknown</option>
-                <option value="50ml">50ml — Nip</option>
-                <option value="200ml">200ml</option>
-                <option value="375ml">375ml — Half</option>
-                <option value="750ml">750ml — Standard</option>
-                <option value="1L">1L</option>
-                <option value="1.75L">1.75L — Handle</option>
-              </select>
-            </div>
-          </div>
-
-          <label for="f-spirits-status">Status</label>
-          <select id="f-spirits-status">
-            <option value="Sealed">Sealed</option>
-            <option value="Open">Open</option>
-            <option value="Finished">Finished</option>
-            <option value="Gifted">Gifted</option>
-          </select>
-        </div>
-
-        <!-- ── Shared: Score ── -->
-        <label>Score</label>
-        <div class="score-row" id="score-row">
-          <button type="button" class="score-btn" data-val="1">1</button>
-          <button type="button" class="score-btn" data-val="2">2</button>
-          <button type="button" class="score-btn" data-val="3">3</button>
-          <button type="button" class="score-btn" data-val="4">4</button>
-          <button type="button" class="score-btn" data-val="5">5</button>
-          <button type="button" class="score-btn" data-val="6">6</button>
-          <button type="button" class="score-btn" data-val="7">7</button>
-          <button type="button" class="score-btn" data-val="8">8</button>
-          <button type="button" class="score-btn" data-val="9">9</button>
-          <button type="button" class="score-btn" data-val="10">10</button>
-          <span class="score-label" id="score-label">—</span>
-        </div>
-        <input type="hidden" id="f-score" value="" />
-
-        <!-- ── Shared: Notes ── -->
-        <label for="f-notes">Notes</label>
-        <textarea id="f-notes" placeholder="Tasting notes, thoughts..."></textarea>
-
-        <div class="modal-actions">
-          <button type="button" id="btn-cancel" class="btn-secondary">Cancel</button>
-          <button type="submit" class="btn-primary">[ SAVE ]</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ── Delete Confirm Modal ── -->
-  <div id="delete-overlay" class="modal-overlay hidden">
-    <div class="modal modal-sm">
-      <h2>Confirm Delete</h2>
-      <p id="delete-msg">This entry will be permanently removed from the registry.</p>
-      <div class="modal-actions">
-        <button id="btn-delete-cancel" class="btn-secondary">Abort</button>
-        <button id="btn-delete-confirm" class="btn-danger">[ Delete ]</button>
+        <button class="icon-button" value="close" aria-label="Close quiz">×</button>
       </div>
-    </div>
-  </div>
+      <div id="quiz-content"></div>
+      <div class="quiz-footer">
+        <button class="ghost-button" id="quiz-reveal" type="button">Reveal answer</button>
+        <button class="primary-button" id="quiz-next" type="button">Next question</button>
+      </div>
+    </form>
+  </dialog>
 
-  <!-- Mobile FAB -->
-  <button class="fab" id="fab-add" aria-label="Add entry">+</button>
+  <template id="card-template">
+    <article class="instrument-card">
+      <div class="card-image" aria-hidden="true"></div>
+      <div class="card-body">
+        <div class="card-topline">
+          <span class="pill category"></span>
+          <span class="pill difficulty"></span>
+        </div>
+        <h2></h2>
+        <p class="subcategory"></p>
+        <dl class="facts"></dl>
+        <div class="tags"></div>
+        <label class="learned-toggle">
+          <input type="checkbox" />
+          <span>Mark learned</span>
+        </label>
+      </div>
+    </article>
+  </template>
 
-  <!-- Mobile bottom nav -->
-  <nav class="bottom-nav">
-    <button class="bnav-tab active" data-cat="manga" id="bnav-manga">
-      <span class="bnav-icon">&#x1F4DA;</span>
-      Manga
-    </button>
-    <button class="bnav-tab" data-cat="spirits" id="bnav-spirits">
-      <span class="bnav-icon">&#x1F943;</span>
-      Spirits
-    </button>
-  </nav>
-
-  <script src="app.js"></script>
+  <script src="app.js" defer></script>
 </body>
 </html>
